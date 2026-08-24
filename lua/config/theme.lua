@@ -216,6 +216,9 @@ local function apply()
   hl("WinBar",         { fg = u.fg_dim, bg = "none" })
   hl("WinBarNC",       { fg = u.dim, bg = "none" })
   hl("StatusAccent",   { fg = u.fg_dim })
+  hl("StatusMode",     { fg = u.fg_dim })
+  hl("StatusLineTerm", { fg = u.fg_dim, bg = "none" })
+  hl("StatusLineTermNC",{ fg = u.dim, bg = "none" })
 
   -- Statusline mode colors: ramp derived from terminal bg/fg (grayscale)
   local mode_names = { "StatusModeN", "StatusModeI", "StatusModeV", "StatusModeC", "StatusModeT", "StatusModeR", "StatusModeS" }
