@@ -26,6 +26,7 @@ dashboard.section.buttons.val = {
   btn("f",  "Find in files",  tb.live_grep),
   btn("r",  "Recent files",   tb.oldfiles),
   btn("g",  "Git status",     tb.git_status),
+  btn("P",  "Projects",       "<cmd>Telescope projects<CR>"),
   btn("t",  "TODO list",      "<cmd>TodoTelescope<CR>"),
   btn("s",  "Restore session","<cmd>lua require('persistence').load()<CR>"),
   btn("c",  "Config",         "<cmd>e ~/.config/nvim/init.lua<CR>"),
