@@ -1,0 +1,124 @@
+[submodule "pack/vendor/start/alpha-nvim"]
+	path = pack/vendor/start/alpha-nvim
+	url = https://github.com/goolord/alpha-nvim
+	branch = main
+[submodule "pack/vendor/start/cmp-buffer"]
+	path = pack/vendor/start/cmp-buffer
+	url = https://github.com/hrsh7th/cmp-buffer
+	branch = main
+[submodule "pack/vendor/start/cmp-luasnip"]
+	path = pack/vendor/start/cmp-luasnip
+	url = https://github.com/saadparwaiz1/cmp_luasnip
+	branch = master
+[submodule "pack/vendor/start/cmp-nvim-lsp"]
+	path = pack/vendor/start/cmp-nvim-lsp
+	url = https://github.com/hrsh7th/cmp-nvim-lsp
+	branch = main
+[submodule "pack/vendor/start/cmp-path"]
+	path = pack/vendor/start/cmp-path
+	url = https://github.com/hrsh7th/cmp-path
+	branch = main
+[submodule "pack/vendor/start/codeium.nvim"]
+	path = pack/vendor/start/codeium.nvim
+	url = https://github.com/Exafunction/windsurf.nvim
+	branch = main
+[submodule "pack/vendor/start/Comment.nvim"]
+	path = pack/vendor/start/Comment.nvim
+	url = https://github.com/numToStr/Comment.nvim
+	branch = master
+[submodule "pack/vendor/start/dressing.nvim"]
+	path = pack/vendor/start/dressing.nvim
+	url = https://github.com/stevearc/dressing.nvim
+	branch = master
+[submodule "pack/vendor/start/flash.nvim"]
+	path = pack/vendor/start/flash.nvim
+	url = https://github.com/folke/flash.nvim
+	branch = main
+[submodule "pack/vendor/start/friendly-snippets"]
+	path = pack/vendor/start/friendly-snippets
+	url = https://github.com/rafamadriz/friendly-snippets
+	branch = main
+[submodule "pack/vendor/start/gitsigns.nvim"]
+	path = pack/vendor/start/gitsigns.nvim
+	url = https://github.com/lewis6991/gitsigns.nvim
+	branch = main
+[submodule "pack/vendor/start/grug-far.nvim"]
+	path = pack/vendor/start/grug-far.nvim
+	url = https://github.com/MagicDuck/grug-far.nvim
+	branch = main
+[submodule "pack/vendor/start/indent-blankline.nvim"]
+	path = pack/vendor/start/indent-blankline.nvim
+	url = https://github.com/lukas-reineke/indent-blankline.nvim
+	branch = master
+[submodule "pack/vendor/start/lazygit.nvim"]
+	path = pack/vendor/start/lazygit.nvim
+	url = https://github.com/kdheepak/lazygit.nvim
+	branch = main
+[submodule "pack/vendor/start/LuaSnip"]
+	path = pack/vendor/start/LuaSnip
+	url = https://github.com/L3MON4D3/LuaSnip
+	branch = master
+[submodule "pack/vendor/start/marks.nvim"]
+	path = pack/vendor/start/marks.nvim
+	url = https://github.com/chentoast/marks.nvim
+	branch = master
+[submodule "pack/vendor/start/nvim-autopairs"]
+	path = pack/vendor/start/nvim-autopairs
+	url = https://github.com/windwp/nvim-autopairs
+	branch = master
+[submodule "pack/vendor/start/nvim-cmp"]
+	path = pack/vendor/start/nvim-cmp
+	url = https://github.com/hrsh7th/nvim-cmp
+	branch = main
+[submodule "pack/vendor/start/nvim-colorizer.lua"]
+	path = pack/vendor/start/nvim-colorizer.lua
+	url = https://github.com/norcalli/nvim-colorizer.lua
+	branch = master
+[submodule "pack/vendor/start/nvim-surround"]
+	path = pack/vendor/start/nvim-surround
+	url = https://github.com/kylechui/nvim-surround
+	branch = main
+[submodule "pack/vendor/start/nvim-ts-autotag"]
+	path = pack/vendor/start/nvim-ts-autotag
+	url = https://github.com/windwp/nvim-ts-autotag
+	branch = main
+[submodule "pack/vendor/start/persistence.nvim"]
+	path = pack/vendor/start/persistence.nvim
+	url = https://github.com/folke/persistence.nvim
+	branch = main
+[submodule "pack/vendor/start/plenary.nvim"]
+	path = pack/vendor/start/plenary.nvim
+	url = https://github.com/nvim-lua/plenary.nvim
+	branch = master
+[submodule "pack/vendor/start/telescope-fzf-native.nvim"]
+	path = pack/vendor/start/telescope-fzf-native.nvim
+	url = https://github.com/nvim-telescope/telescope-fzf-native.nvim
+	branch = main
+[submodule "pack/vendor/start/telescope.nvim"]
+	path = pack/vendor/start/telescope.nvim
+	url = https://github.com/nvim-telescope/telescope.nvim
+	branch = master
+[submodule "pack/vendor/start/todo-comments.nvim"]
+	path = pack/vendor/start/todo-comments.nvim
+	url = https://github.com/folke/todo-comments.nvim
+	branch = main
+[submodule "pack/vendor/start/trouble.nvim"]
+	path = pack/vendor/start/trouble.nvim
+	url = https://github.com/folke/trouble.nvim
+	branch = main
+[submodule "pack/vendor/start/undotree"]
+	path = pack/vendor/start/undotree
+	url = https://github.com/mbbill/undotree
+	branch = master
+[submodule "pack/vendor/start/vim-illuminate"]
+	path = pack/vendor/start/vim-illuminate
+	url = https://github.com/RRethy/vim-illuminate
+	branch = master
+[submodule "pack/vendor/start/vim-visual-multi"]
+	path = pack/vendor/start/vim-visual-multi
+	url = https://github.com/mg979/vim-visual-multi
+	branch = master
+[submodule "pack/vendor/start/which-key.nvim"]
+	path = pack/vendor/start/which-key.nvim
+	url = https://github.com/folke/which-key.nvim
+	branch = main

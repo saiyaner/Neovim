@@ -1,0 +1,15 @@
+# Editor / OS junk
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Local overrides (create these if you need machine-specific tweaks)
+lua/config/local.lua
+
+# Logs
+*.log
+
+# Never commit credentials / caches
+.netrc
+*.local
