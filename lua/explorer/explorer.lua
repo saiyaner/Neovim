@@ -21,7 +21,7 @@
 --   R       refresh
 --   q       close
 local M = {}
-local icons = require("config.icons")
+local icons = require("ui.icons")
 
 local ns = vim.api.nvim_create_namespace("explorer")
 

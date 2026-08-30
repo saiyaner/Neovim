@@ -113,3 +113,29 @@ vim.keymap.set("i", "<M-[>", function()
 end, { silent = true, desc = "Codeium: saran sebelumnya" })
 
 -- CmpItemKind* colors are owned by config.theme (they follow the terminal accent).
+
+-- luacnv.lsp integration: refactor and fix triggered by <leader>la / <leader>lfa
+local luacnv = pcall(require, "luacnv")
+if luacnv then
+  local function get_source()
+    return cmp.get_active_document_selection() or vim.bo.filetype == "typescript" and "lua"
+  end
+
+  local refactor_cmds = {
+    "add_return", "remove_braces", "use_async", "extract_method", "inline_method",
+    "convert_to_array_literal", "replace_function_with_method",
+    "move_block_of_code_up", "move_block_of_code_down",
+  }
+
+  vim.keymap.set("n", "<leader>la", function()
+    local source = get_source()
+    luacnv.refactor_lsp({ source = source, cmds = refactor_cmds })
+    cmp.confirm({ select = true })
+  end, { desc = "Lua: Refactor (luacnv)" })
+
+  vim.keymap.set("n", "<leader>lfa", function()
+    local source = get_source()
+    luacnv.fix_lsp({ source = source, fixers = {} })
+    cmp.confirm({ select = true })
+  end, { desc = "Lua: Fix (luacnv)" })
+end

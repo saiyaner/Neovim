@@ -1,58 +1,32 @@
-local opt = vim.opt
+-- Global Vim Options Configuration
+vim.g.loaded_config_options = true
 
--- Line numbers
-opt.number = true
-opt.relativenumber = true
+-- Tab settings (using autocmd for consistent behavior across buffers)
+autocmd("BufNewFile", function()
+  vim.opt.tabstop = 2
+  vim.opt.shiftwidth = 2
+  vim.opt.textwidth = 100
+end)
 
--- Tabs & indentation
-opt.tabstop = 4
-opt.shiftwidth = 4
-opt.expandtab = true
-opt.smartindent = true
-opt.autoindent = true
+-- Numbering and Cursor options
+autocmd("BufRead", {silent = true}, function()
+  vim.opt.number = true
+  vim.opt.cursorline = true
+  vim.opt.splitright = false
+end)
 
--- Search
-opt.ignorecase = true
-opt.smartcase = true
-opt.hlsearch = true
-opt.incsearch = true
+-- Text formatting
+vim.opt.encoding = "utf-8"
+vim.opt.textwidth = 100
+vim.opt.smartcase = true
+vim.opt.smartcase = false
+vim.opt.signcolumn = "yes"
 
--- Cursor & scrolling
-opt.cursorline = true
-opt.scrolloff = 8
-opt.sidescrolloff = 8
+-- Folding options
+vim.opt.foldcolumn = "1"
+vim.opt.foldmethod = "expr"
 
--- Editing
-opt.mouse = "a"
-opt.clipboard = "unnamedplus"
-opt.breakindent = true
-opt.undofile = true
-opt.swapfile = false
-opt.completeopt = "menu,menuone,noselect"
-opt.formatoptions = "jcroqlnt"
-
--- Window behavior
-opt.splitright = true
-opt.splitbelow = true
-opt.termguicolors = true
-opt.showmode = false
-opt.signcolumn = "yes"
-opt.wrap = false
-opt.linebreak = true
-
--- Display
-opt.list = true
-opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-opt.inccommand = "split"
-opt.fillchars = { eob = " " }
-
--- Timing
-opt.updatetime = 250
-opt.timeoutlen = 400
-
--- Statusline + winbar + tab bar
-opt.laststatus = 2
-opt.statusline = "%!v:lua.require('config.statusline').statusline()"
-opt.winbar = "%!v:lua.require('config.statusline').winbar()"
-opt.showtabline = 2
-opt.tabline = "%!v:lua.require('config.tabline').tabline()"
+-- GUI support
+autocmd("TermOpen", {silent = true}, function()
+  vim.opt.termguicolors = true
+end)
