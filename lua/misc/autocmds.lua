@@ -55,6 +55,63 @@ api.nvim_create_autocmd("TermOpen", {
   end,
 })
 
+-- Auto-open explorer when nvim starts with a directory argument
+-- Also handles `nvim` with no args inside a project: show dashboard (alpha handles it)
+api.nvim_create_autocmd("VimEnter", {
+  group = augroup,
+  callback = function()
+    local argv = vim.fn.argv()
+    if #argv == 1 and vim.fn.isdirectory(argv[1]) == 1 then
+      vim.defer_fn(function()
+        -- Clean the directory buffer that Neovim creates for `nvim .`
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          if vim.api.nvim_buf_is_valid(buf) then
+            local name = vim.api.nvim_buf_get_name(buf)
+            if name ~= "" and vim.fn.isdirectory(name) == 1 then
+              pcall(vim.api.nvim_buf_delete, buf, { force = true })
+            end
+          end
+        end
+        local dir = vim.fn.fnamemodify(argv[1], ":p"):gsub("/$", "")
+        if vim.fn.isdirectory(dir) == 0 then
+          dir = vim.fn.getcwd()
+        end
+        require("explorer").open_here(dir)
+        -- Clean empty [No Name] buffers after explorer opens (deferred)
+        vim.defer_fn(function()
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+              local name = vim.api.nvim_buf_get_name(buf)
+              if name == "" and not vim.bo[buf].modified then
+                pcall(vim.api.nvim_buf_delete, buf, { force = true })
+              end
+            end
+          end
+        end, 50)
+      end, 20)
+    end
+  end,
+})
+
+-- Hide directory buffers from buffer list (so tabline doesn't show them)
+api.nvim_create_autocmd({ "BufEnter", "BufReadPost" }, {
+  group = augroup,
+  callback = function(args)
+    local name = vim.api.nvim_buf_get_name(args.buf)
+    if name ~= "" and vim.fn.isdirectory(name) == 1 then
+      vim.bo[args.buf].buflisted = false
+      -- if this is the current buffer and it's a directory, wipe it if explorer not open
+      if args.buf == vim.api.nvim_get_current_buf() and not require("explorer").is_open() then
+        vim.schedule(function()
+          if vim.api.nvim_buf_is_valid(args.buf) and vim.fn.isdirectory(vim.api.nvim_buf_get_name(args.buf)) == 1 then
+            vim.api.nvim_buf_delete(args.buf, { force = true })
+          end
+        end)
+      end
+    end
+  end,
+})
+
 -- LSP keymaps (built into Neovim, no plugins needed)
 api.nvim_create_autocmd("LspAttach", {
   group = augroup,

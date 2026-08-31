@@ -5,8 +5,8 @@ opt.number = true
 opt.relativenumber = true
 
 -- Tabs & indentation
-opt.tabstop = 4
-opt.shiftwidth = 4
+opt.tabstop = 2
+opt.shiftwidth = 2
 opt.expandtab = true
 opt.smartindent = true
 opt.autoindent = true
@@ -52,7 +52,7 @@ opt.timeoutlen = 400
 
 -- Statusline + winbar + tab bar
 opt.laststatus = 2
-opt.statusline = "%!v:lua.require('config.statusline').statusline()"
-opt.winbar = "%!v:lua.require('config.statusline').winbar()"
+opt.statusline = "%!v:lua.require('statusline').statusline()"
+opt.winbar = "%!v:lua.require('statusline').winbar()"
 opt.showtabline = 2
-opt.tabline = "%!v:lua.require('config.tabline').tabline()"
+opt.tabline = "%!v:lua.require('statusline.tabline').tabline()"

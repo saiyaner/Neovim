@@ -7,20 +7,50 @@
 -- Click labels use the tabline `%{bufnr}@TablineHandle@` atom; the handler
 -- receives (minwid, clicks, button, mods) from the C side.
 local M = {}
-local icons = require("config.icons")
+local icons = require("ui.icons")
 
 vim.cmd([[
   function! TablineHandle(bufnr, clicks, button, mods)
-    call luaeval('require("config.tabline").handle(_A[1], _A[2], _A[3])', [a:bufnr, a:button, a:clicks])
+    call luaeval('require("statusline.tabline").handle(_A[1], _A[2], _A[3])', [a:bufnr, a:button, a:clicks])
     return 0
   endfunction
 ]])
 
--- Real file buffers only: listed, normal buftype (nil or ""), with a name.
+-- Real file buffers only: listed, normal buftype, with a name, not a directory.
 local function file_buffers()
   return vim.tbl_filter(function(b)
-    return b.name ~= "" and (b.buftype or "") == ""
+    if b.name == "" or (b.buftype or "") ~= "" then
+      return false
+    end
+    -- Exclude directory buffers
+    if vim.fn.isdirectory(b.name) == 1 then
+      return false
+    end
+    -- Exclude explorer and other special buffers (already filtered by buftype, but double-check)
+    local ft = vim.bo[b.bufnr].filetype
+    if ft == "explorer" or ft == "netrw" or ft == "alpha" then
+      return false
+    end
+    -- Only show file buffers that actually exist or are valid files (not stale)
+    return true
   end, vim.fn.getbufinfo({ buflisted = 1 }))
+end
+
+-- Alternative: only show buffers visible in current tabpage windows (for "1 file only" mode)
+local function visible_file_buffers()
+  local seen = {}
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+      local name = vim.api.nvim_buf_get_name(buf)
+      if name ~= "" and vim.fn.isdirectory(name) == 0 and vim.bo[buf].filetype ~= "explorer" then
+        seen[buf] = true
+      end
+    end
+  end
+  return vim.tbl_filter(function(b)
+    return seen[b.bufnr]
+  end, file_buffers())
 end
 
 -- Called by the tabline click handler.

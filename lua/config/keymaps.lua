@@ -1,14 +1,9 @@
--- Custom Keybinds Configuration
+-- Custom Keybinds Configuration (non-conflicting with misc/keymaps)
 vim.g.loaded_config_keymaps = true
 
--- Navigation shortcuts
-vim.keymap.set("n", "<C-h>", function() vim.lsp.buf.code_action({ actionItem = "Fix All" }) end, { desc = "Quick Fix (LSP)" })
-vim.keymap.set("n", "<C-j>", function() vim.lsp.buf.rangeFormatting(0, -1) end, { desc = "Format Selection" })
+-- LSP quick fixes (use leader variants to avoid clashing with window nav C-h/C-j)
+vim.keymap.set("n", "<leader>qf", function() vim.lsp.buf.code_action({ actionItem = "Fix All" }) end, { desc = "Quick Fix (LSP)" })
+vim.keymap.set("n", "<leader>cf", function() vim.lsp.buf.format({ async = true }) end, { desc = "LSP Format" })
 
--- Buffer navigation
-vim.keymap.set("n", "<C-k>", function() require("explorer").jumpUp() end, { desc = "Explorer Up" })
-vim.keymap.set("n", "<C-l>", function() require("explorer").jumpDown() end, { desc = "Explorer Down" })
-
--- Editor actions
-vim.keymap.set("n", "<leader>f", function() vim.lsp.buf.format {} end, { desc = "LSP Format" })
-vim.keymap.set("n", "<leader>q", function() require("explorer").close() end, { desc = "Close Tab" })
+-- Explorer is handled via <leader>e in misc/keymaps (space+e)
+-- Close explorer is handled by 'q' inside explorer buffer

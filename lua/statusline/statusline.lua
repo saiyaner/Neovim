@@ -1,5 +1,5 @@
 local api = vim.api
-local icons = require("config.icons")
+local icons = require("ui.icons")
 
 local mode_map = {
   n = "NORMAL", i = "INSERT", v = "VISUAL", V = "V-LINE",

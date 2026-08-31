@@ -23,7 +23,7 @@ map("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
 map("n", "<leader>bb", "<cmd>e #<CR>", { desc = "Switch to other buffer" })
 
 -- File explorer (custom, with icons)
-map("n", "<leader>e", "<cmd>lua require('config.explorer').toggle()<CR>", { desc = "Toggle file explorer" })
+map("n", "<leader>e", "<cmd>lua require('explorer').toggle()<CR>", { desc = "Toggle file explorer" })
 
 -- Move lines / selections
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
@@ -40,13 +40,13 @@ map("n", "N", "Nzzzv", { desc = "Previous match (centered)" })
 
 -- Close current buffer (VSCode: close tab)
 map("n", "<leader>x", function()
-  require("config.tabline").close_buf(0)
+  require("statusline.tabline").close_buf(0)
 end, { desc = "Close current buffer" })
 
 -- Switch tabs with Alt+1..9 (VSCode-style)
 for i = 1, 9 do
   map("n", ("<M-%d>"):format(i), function()
-    require("config.tabline").goto_tab(i)
+    require("statusline.tabline").goto_tab(i)
   end, { desc = ("Go to tab %d"):format(i) })
 end
 
@@ -82,7 +82,7 @@ map("n", "<leader>di", tb.diagnostics, { desc = "Diagnostics (problems)" })
 map("n", "<leader>fl", tb.current_buffer_fuzzy_find, { desc = "Lines in buffer (Ctrl+G)" })
 
 -- Window splits (VSCode Ctrl+\ style)
-map("n", "<leader>s", "<cmd>split<CR>", { desc = "Split horizontal" })
+map("n", "<leader>sh", "<cmd>split<CR>", { desc = "Split horizontal" })
 map("n", "<leader>v", "<cmd>vsplit<CR>", { desc = "Split vertical" })
 map("n", "<leader>sw", "<cmd>wincmd =<CR>", { desc = "Equalize windows" })
 map("n", "<leader>so", "<cmd>only<CR>", { desc = "Close other windows" })

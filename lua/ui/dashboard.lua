@@ -21,7 +21,7 @@ dashboard.section.header.opts.hl = "AlphaHeader"
 
 local tb = require("telescope.builtin")
 dashboard.section.buttons.val = {
-  btn("e",  "Explorer",       "<cmd>lua require('config.explorer').toggle()<CR>"),
+  btn("e",  "Explorer",       "<cmd>lua require('explorer').toggle()<CR>"),
   btn("p",  "Find file",      tb.find_files),
   btn("f",  "Find in files",  tb.live_grep),
   btn("r",  "Recent files",   tb.oldfiles),

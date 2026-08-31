@@ -19,15 +19,17 @@
 --   r       rename selected file/folder
 --   d       delete selected file/folder (asks for confirmation)
 --   R       refresh
+--   H       toggle hidden files
 --   q       close
 local M = {}
 local icons = require("ui.icons")
 
 local ns = vim.api.nvim_create_namespace("explorer")
 
-local state = { buf = nil, win = nil, dir = nil }
+local state = { buf = nil, win = nil, dir = nil, show_hidden = false }
 local meta = {}    -- line (below header) -> node
 local expanded = {} -- path -> true; remembered across renders
+local git_status_cache = {} -- path -> git status
 
 local function tree_width()
   return math.max(30, math.floor(vim.o.columns * 0.3))
@@ -59,6 +61,47 @@ local function close()
   meta = {}
 end
 
+local function get_git_status(path)
+  if git_status_cache[path] then
+    return git_status_cache[path]
+  end
+  local uv = vim.uv or vim.loop
+  local stat = uv.fs_stat(path)
+  if not stat then
+    return " "
+  end
+  -- Check if file is tracked by git
+  local cmd = string.format("git -C %s status --porcelain -- %s 2>/dev/null", vim.fn.shellescape(state.dir), vim.fn.shellescape(path))
+  local handle = io.popen(cmd)
+  if not handle then
+    return " "
+  end
+  local result = handle:read("*a")
+  handle:close()
+  result = result:gsub("%s+$", "")
+  if result == "" then
+    git_status_cache[path] = " " -- clean
+    return " "
+  end
+  local status_char = result:sub(1, 1)
+  local status_map = {
+    ["M"] = "󰏫", -- modified
+    ["A"] = "󰐖", -- added
+    ["D"] = "󰍵", -- deleted
+    ["R"] = "󰁕", -- renamed
+    ["C"] = "󰆏", -- copied
+    ["U"] = "󰜺", -- unmerged
+    ["?"] = "󰈔", -- untracked
+    ["!"] = "󰈑", -- ignored
+  }
+  git_status_cache[path] = status_map[status_char] or "●"
+  return git_status_cache[path]
+end
+
+local function clear_git_cache()
+  git_status_cache = {}
+end
+
 local function scandir(dir)
   local uv = vim.uv or vim.loop
   local fd = uv.fs_scandir(dir)
@@ -71,7 +114,8 @@ local function scandir(dir)
     if not name then
       break
     end
-    if name ~= ".git" then
+    -- Skip .git always, skip hidden files unless show_hidden is true
+    if name ~= ".git" and (state.show_hidden or not name:match("^%.")) then
       table.insert(entries, { name = name, is_dir = t == "directory" })
     end
   end
@@ -93,7 +137,8 @@ local function render()
     sel_path = node and node.path or nil
   end
 
-  local lines = { ("󰉋 %s/"):format(vim.fn.fnamemodify(state.dir, ":~")) }
+  local hidden_indicator = state.show_hidden and " 󰈈" or ""
+  local lines = { ("󰉋 %s/%s"):format(vim.fn.fnamemodify(state.dir, ":~"), hidden_indicator) }
   meta = {}
 
   local function walk(dir, depth)
@@ -107,8 +152,13 @@ local function render()
         parent = dir,
       }
       table.insert(meta, node)
+      local git_icon = " "
+      if not e.is_dir then
+        git_icon = get_git_status(path) .. " "
+      end
       local icon = e.is_dir and (expanded[path] and "󰝰" or "󰉋") or icons.for_name(e.name)[1]
-      table.insert(lines, ("  "):rep(depth) .. icon .. " " .. e.name)
+      local indent = ("  "):rep(depth)
+      table.insert(lines, indent .. icon .. " " .. e.name .. git_icon)
       if e.is_dir and expanded[path] then
         walk(path, depth + 1)
       end
@@ -123,6 +173,13 @@ local function render()
   for i, node in ipairs(meta) do
     local group = node.is_dir and "IconCyan" or icons.for_name(node.name)[2]
     vim.api.nvim_buf_add_highlight(b, ns, group, i, 0, -1)
+    -- Highlight git status icons
+    if not node.is_dir then
+      local git_icon = get_git_status(node.path)
+      if git_icon ~= " " then
+        vim.api.nvim_buf_add_highlight(b, ns, "GitSignsChange", i, #lines[i+1] - 2, -1)
+      end
+    end
   end
 
   if win then
@@ -160,9 +217,9 @@ local function editor_target()
   local target
   vim.api.nvim_win_call(state.win, function()
     vim.cmd("vsplit")
-    target = vim.api.nvim_get_current_win() -- capture before nvim restores the previous window
+    target = vim.api.nvim_get_current_win()
   end)
-  vim.api.nvim_win_set_width(state.win, tree_width()) -- re-apply the fixed width after the split
+  vim.api.nvim_win_set_width(state.win, tree_width())
   return target
 end
 
@@ -176,11 +233,46 @@ local function action()
     render()
   else
     local target = editor_target()
+    local new_path = vim.fs.normalize(node.path)
+    -- Open file in target window
     vim.api.nvim_win_call(target, function()
-      vim.cmd.edit(vim.fn.fnameescape(vim.fs.normalize(node.path)))
+      vim.cmd.edit(vim.fn.fnameescape(new_path))
     end)
+    -- Switch to the target window
     vim.api.nvim_set_current_win(target)
-    close()
+    local new_buf = vim.api.nvim_get_current_buf()
+    -- Close explorer window explicitly using saved state.win
+    local explorer_w = state.win
+    if explorer_w and vim.api.nvim_win_is_valid(explorer_w) then
+      vim.api.nvim_win_close(explorer_w, true)
+    end
+    state.buf, state.win, state.dir = nil, nil, nil
+    meta = {}
+    -- Single-file mode: only keep the newly opened file in tabline
+    -- Wipe other listed file buffers (not modified) so tabline shows only 1
+    vim.schedule(function()
+      for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+        if b.bufnr ~= new_buf and b.name ~= "" and (b.buftype or "") == "" then
+          if vim.fn.isdirectory(b.name) == 0 then
+            local ft = vim.bo[b.bufnr].filetype
+            if ft ~= "explorer" and not vim.bo[b.bufnr].modified then
+              -- Don't delete if it's the alternate buffer with unsaved changes
+              pcall(vim.api.nvim_buf_delete, b.bufnr, { force = false })
+            end
+          else
+            pcall(vim.api.nvim_buf_delete, b.bufnr, { force = true })
+          end
+        end
+      end
+      -- Also wipe any empty [No Name] buffers
+      for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+        if b.name == "" and b.bufnr ~= new_buf then
+          if not vim.bo[b.bufnr].modified then
+            pcall(vim.api.nvim_buf_delete, b.bufnr, { force = true })
+          end
+        end
+      end
+    end)
   end
 end
 
@@ -218,6 +310,7 @@ local function create()
   if node and node.is_dir then
     expanded[node.path] = true -- reveal the new entry
   end
+  clear_git_cache()
   render()
 end
 
@@ -247,6 +340,7 @@ local function rename()
     vim.notify("Rename failed", vim.log.levels.ERROR)
     return
   end
+  clear_git_cache()
   render()
 end
 
@@ -276,6 +370,13 @@ local function delete()
       expanded[p] = nil
     end
   end
+  clear_git_cache()
+  render()
+end
+
+local function toggle_hidden()
+  state.show_hidden = not state.show_hidden
+  clear_git_cache()
   render()
 end
 
@@ -301,6 +402,7 @@ local function setup()
   vim.keymap.set("n", "r", rename, { buffer = state.buf, desc = "Rename" })
   vim.keymap.set("n", "d", delete, { buffer = state.buf, desc = "Delete" })
   vim.keymap.set("n", "R", render, { buffer = state.buf, desc = "Refresh" })
+  vim.keymap.set("n", "H", toggle_hidden, { buffer = state.buf, desc = "Toggle hidden files" })
   vim.keymap.set("n", "q", close, { buffer = state.buf, desc = "Close" })
 
   render()
@@ -313,6 +415,20 @@ local function open(win, dir)
   state.buf = vim.api.nvim_create_buf(true, true)
   vim.api.nvim_win_set_buf(win, state.buf)
   setup()
+  -- Clean up any stray empty buffers that would pollute tabline
+  vim.schedule(function()
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_valid(buf) and buf ~= state.buf and vim.bo[buf].buflisted then
+        local name = vim.api.nvim_buf_get_name(buf)
+        if name == "" and not vim.bo[buf].modified then
+          local ok, lines = pcall(vim.api.nvim_buf_get_lines, buf, 0, 1, false)
+          if ok and (#lines == 0 or (#lines == 1 and lines[1] == "")) then
+            pcall(vim.api.nvim_buf_delete, buf, { force = true })
+          end
+        end
+      end
+    end
+  end)
 end
 
 -- `<leader>e`: toggle. Opens the explorer at the far left of the tab.
@@ -326,11 +442,46 @@ function M.toggle()
 end
 
 -- `nvim <dir>`: the explorer takes over the initial window (no split yet).
-function M.open_here()
+function M.open_here(dir)
   if explorer_win() then
     return
   end
-  open(vim.api.nvim_get_current_win(), vim.fn.getcwd())
+  local target_dir = dir and vim.fn.isdirectory(dir) == 1 and vim.fs.normalize(dir) or vim.fn.getcwd()
+  open(vim.api.nvim_get_current_win(), target_dir)
+end
+
+function M.is_open()
+  return explorer_win() ~= nil
+end
+
+function M.get_dir()
+  return state.dir
+end
+
+-- Auto-refresh on file system changes
+local fs_watch_handle
+function M.start_watcher()
+  if fs_watch_handle then
+    return
+  end
+  local uv = vim.uv or vim.loop
+  fs_watch_handle = uv.new_fs_event()
+  fs_watch_handle:start(state.dir, { recursive = true }, function(err, fname, events)
+    if err then
+      return
+    end
+    vim.schedule(function()
+      clear_git_cache()
+      render()
+    end)
+  end)
+end
+
+function M.stop_watcher()
+  if fs_watch_handle then
+    fs_watch_handle:stop()
+    fs_watch_handle = nil
+  end
 end
 
 return M

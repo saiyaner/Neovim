@@ -5,9 +5,17 @@
 local cmp_lsp = require("cmp_nvim_lsp")
 local capabilities = cmp_lsp.default_capabilities()
 
+-- Use new Neovim 0.11+ APIs if available, fallback to lspconfig-style for 0.10
 local function setup(name, opts)
-  vim.lsp.config(name, vim.tbl_deep_extend("force", { capabilities = capabilities }, opts or {}))
-  vim.lsp.enable(name)
+  opts = vim.tbl_deep_extend("force", { capabilities = capabilities }, opts or {})
+  if vim.lsp.config then
+    -- Neovim 0.11+
+    vim.lsp.config(name, opts)
+    vim.lsp.enable(name)
+  else
+    -- Neovim 0.10 fallback
+    require("lspconfig")[name].setup(opts)
+  end
 end
 
 setup("lua_ls", {
@@ -46,8 +54,6 @@ setup("eslint", {
   cmd = { "eslint", "--stdin" },
   settings = {
     codeAction = { disableRuleComment = { enable = true }, generateDocs = true },
-    -- eslint needs to run on the whole workspace in some scenarios, but not globally
-    -- for files with "eslint-disable"
     codeActionOnSave = { enable = false },
     rulesCustomizations = {},
     format = { enable = true },
@@ -63,3 +69,10 @@ end
 
 vim.lsp.handlers["textDocument/hover"] = with_border(vim.lsp.handlers.hover)
 vim.lsp.handlers["textDocument/signatureHelp"] = with_border(vim.lsp.handlers.signature_help)
+
+-- Compatibility: expose ready() for init.lua
+local M = {}
+function M:ready()
+  -- LSP is ready after setup() calls above
+end
+return M
