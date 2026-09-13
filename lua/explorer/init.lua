@@ -240,7 +240,6 @@ local function action()
     end)
     -- Switch to the target window
     vim.api.nvim_set_current_win(target)
-    local new_buf = vim.api.nvim_get_current_buf()
     -- Close explorer window explicitly using saved state.win
     local explorer_w = state.win
     if explorer_w and vim.api.nvim_win_is_valid(explorer_w) then
@@ -248,28 +247,17 @@ local function action()
     end
     state.buf, state.win, state.dir = nil, nil, nil
     meta = {}
-    -- Single-file mode: only keep the newly opened file in tabline
-    -- Wipe other listed file buffers (not modified) so tabline shows only 1
+    -- Clean up only empty / directory buffers, keep file buffers for tabline
     vim.schedule(function()
       for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
-        if b.bufnr ~= new_buf and b.name ~= "" and (b.buftype or "") == "" then
-          if vim.fn.isdirectory(b.name) == 0 then
-            local ft = vim.bo[b.bufnr].filetype
-            if ft ~= "explorer" and not vim.bo[b.bufnr].modified then
-              -- Don't delete if it's the alternate buffer with unsaved changes
-              pcall(vim.api.nvim_buf_delete, b.bufnr, { force = false })
-            end
-          else
-            pcall(vim.api.nvim_buf_delete, b.bufnr, { force = true })
-          end
+        if b.name ~= "" and vim.fn.isdirectory(b.name) == 1 then
+          pcall(vim.api.nvim_buf_delete, b.bufnr, { force = true })
         end
       end
-      -- Also wipe any empty [No Name] buffers
+      local cur = vim.api.nvim_get_current_buf()
       for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
-        if b.name == "" and b.bufnr ~= new_buf then
-          if not vim.bo[b.bufnr].modified then
-            pcall(vim.api.nvim_buf_delete, b.bufnr, { force = true })
-          end
+        if b.name == "" and b.bufnr ~= cur and not vim.bo[b.bufnr].modified then
+          pcall(vim.api.nvim_buf_delete, b.bufnr, { force = true })
         end
       end
     end)
