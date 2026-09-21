@@ -24,7 +24,6 @@ opt.sidescrolloff = 8
 
 -- Editing
 opt.mouse = "a"
-opt.clipboard = "unnamedplus"
 opt.breakindent = true
 opt.undofile = true
 opt.swapfile = false

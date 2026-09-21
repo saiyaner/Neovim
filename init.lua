@@ -27,6 +27,7 @@ vim.g.loaded_netrwFileHandlers = 1
 
 -- Load core configuration first
 require("config.options")
+require("config.clipboard")
 require("config.keymaps")
 
 -- Load UI and theme
@@ -48,7 +49,6 @@ require("misc.editing")
 require("misc.extras")
 require("misc.marks")
 require("misc.misc")
-require("misc.options")
 require("misc.session")
 require("misc.telescope")
 require("misc.keymaps")

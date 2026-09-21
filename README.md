@@ -21,6 +21,7 @@ A VSCode-style Neovim config — no plugin manager, fast startup, live kitty-the
   - `node`/`npm` (for some LSP servers).
   - A language server, e.g. `lua_ls`, installed where `nvim-lspconfig` can find it.
   - `ripgrep` (`rg`) for Telescope live grep.
+  - A clipboard provider: `wl-clipboard` (Wayland), `xclip`/`xsel` (X11), or `win32yank` (WSL).
 
 ## Installation
 
@@ -56,6 +57,45 @@ in `~/.cache/nvim/codeium/config.json` (outside this repo — nothing secret is 
 ```bash
 nvim        # opens the alpha dashboard on a bare launch
 ```
+
+### Clipboard
+
+The configuration enables the `unnamedplus` register and automatically selects a
+clipboard provider in this order: `wl-copy`/`wl-paste`, `xclip`, `xsel`,
+`win32yank.exe`, and `pbcopy`/`pbpaste`. If none is available, Neovim falls back
+to OSC52 when the installed Neovim version provides it.
+
+Install the provider that matches your environment, then restart Neovim:
+
+```bash
+# Ubuntu/Debian on Wayland
+sudo apt install wl-clipboard
+
+# Ubuntu/Debian on X11
+sudo apt install xclip
+
+# Fedora
+sudo dnf install wl-clipboard xclip
+```
+
+To verify the active provider inside Neovim, run `:checkhealth vim.provider` and
+inspect `:echo g:clipboard.name`. Test with `yy` followed by `Ctrl+Shift+V` in
+another application. In WSL, install `win32yank.exe` and ensure it is on `PATH`.
+
+### Updating the configuration
+
+This repository uses git submodules for plugins. Update the config and plugins
+together with:
+
+```bash
+cd ~/.config/nvim
+git pull --recurse-submodules
+git submodule update --init --recursive
+```
+
+After updating, run `nvim --headless '+checkhealth' '+qa'` and review any errors
+before using the config normally. Keep local customizations in a separate commit
+so they can be restored cleanly if a future update changes a module.
 
 ## Keymaps (highlights)
 
