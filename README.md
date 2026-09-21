@@ -94,7 +94,7 @@ sudo dnf install wl-clipboard xclip
 ```
 
 To verify the active provider inside Neovim, run `:checkhealth vim.provider` and
-inspect `:echo g:clipboard.name`. Test with `yy` followed by `Ctrl+Shift+V` in
+inspect `:echo g:clipboard`. Test with `yy` followed by `Ctrl+Shift+V` in
 another application. In WSL, install `win32yank.exe` and ensure it is on `PATH`.
 
 ### Updating the configuration
