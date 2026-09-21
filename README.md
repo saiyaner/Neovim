@@ -65,6 +65,21 @@ clipboard provider in this order: `wl-copy`/`wl-paste`, `xclip`, `xsel`,
 `win32yank.exe`, and `pbcopy`/`pbpaste`. If none is available, Neovim falls back
 to OSC52 when the installed Neovim version provides it.
 
+On NixOS, `pkgs.perl5Packages.Clipboard` is a Perl library and is not a Neovim
+clipboard provider executable. Add the provider matching your session instead:
+
+```nix
+# Wayland (recommended for modern NixOS desktops)
+environment.systemPackages = with pkgs; [ wl-clipboard ];
+
+# X11
+environment.systemPackages = with pkgs; [ xclip ];
+```
+
+With Home Manager, use the same packages under `home.packages`. Apply the NixOS
+configuration, open a new shell, and verify that `command -v wl-copy wl-paste`
+or `command -v xclip` returns paths.
+
 Install the provider that matches your environment, then restart Neovim:
 
 ```bash
