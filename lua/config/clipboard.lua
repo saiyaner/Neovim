@@ -14,7 +14,10 @@ local function set_provider(name, copy, paste)
   }
 end
 
-if executable("wl-copy") and executable("wl-paste") then
+local has_wayland = (vim.env.WAYLAND_DISPLAY or "") ~= ""
+local has_x11 = (vim.env.DISPLAY or "") ~= ""
+
+if has_wayland and executable("wl-copy") and executable("wl-paste") then
   set_provider("wl-clipboard", {
     ["+"] = { "wl-copy", "--foreground" },
     ["*"] = { "wl-copy", "--primary", "--foreground" },
@@ -22,7 +25,7 @@ if executable("wl-copy") and executable("wl-paste") then
     ["+"] = { "wl-paste", "--no-newline" },
     ["*"] = { "wl-paste", "--primary", "--no-newline" },
   })
-elseif executable("xclip") then
+elseif has_x11 and executable("xclip") then
   set_provider("xclip", {
     ["+"] = { "xclip", "-quiet", "-selection", "clipboard" },
     ["*"] = { "xclip", "-quiet", "-selection", "primary" },
@@ -30,7 +33,7 @@ elseif executable("xclip") then
     ["+"] = { "xclip", "-o", "-selection", "clipboard" },
     ["*"] = { "xclip", "-o", "-selection", "primary" },
   })
-elseif executable("xsel") then
+elseif has_x11 and executable("xsel") then
   set_provider("xsel", {
     ["+"] = { "xsel", "--clipboard", "--input" },
     ["*"] = { "xsel", "--primary", "--input" },
