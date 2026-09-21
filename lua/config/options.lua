@@ -61,4 +61,4 @@ opt.laststatus = 2
 opt.statusline = "%!v:lua.require('statusline').statusline()"
 opt.winbar = "%!v:lua.require('statusline').winbar()"
 opt.showtabline = 2
-opt.tabline = "%!v:lua.require('tabline').tabline()"
+opt.tabline = "%!v:lua.require('statusline.tabline').tabline()"
