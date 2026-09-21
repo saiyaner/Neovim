@@ -128,6 +128,14 @@ so they can be restored cleanly if a future update changes a module.
 | `<leader>xx` | Trouble (workspace diagnostics) |
 | `s` / `S` | Flash jump |
 | `<leader>qs` / `<leader>ql` | Save / load session |
+| `Ctrl+Left` / `Ctrl+Right` | Move by word (normal and insert mode) |
+| `Ctrl+Up` / `Ctrl+Down` | Scroll half-page (normal and insert mode) |
+| `Ctrl+A` / `Ctrl+E` | Line start / line end while inserting |
+| `<leader>w` | Save file |
+| `<leader>wh/wl/wk/wj` | Resize window left/right/up/down |
+| `<leader>tn` / `<leader>tx` | New tab / close tab |
+| `Y` | Yank from cursor to end of line |
+| Visual `p` | Paste without replacing yank register |
 
 ## Structure
 

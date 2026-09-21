@@ -9,11 +9,26 @@ map("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
 map("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
 map("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
 
--- Resize windows
-map("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Increase window height" })
-map("n", "<C-Down>", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
-map("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
-map("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
+-- VSCode-like cursor navigation
+-- Ctrl+Left/Right moves by word; Ctrl+Up/Down scrolls by half a page.
+map("n", "<C-Left>", "b", { desc = "Move to previous word" })
+map("n", "<C-Right>", "w", { desc = "Move to next word" })
+map("n", "<C-Up>", "<C-u>", { desc = "Scroll up" })
+map("n", "<C-Down>", "<C-d>", { desc = "Scroll down" })
+
+-- Keep the same navigation available while typing.
+map("i", "<C-Left>", "<C-o>b", { desc = "Move to previous word" })
+map("i", "<C-Right>", "<C-o>w", { desc = "Move to next word" })
+map("i", "<C-Up>", "<C-o><C-u>", { desc = "Scroll up" })
+map("i", "<C-Down>", "<C-o><C-d>", { desc = "Scroll down" })
+map("i", "<C-a>", "<C-o>^", { desc = "Move to line start" })
+map("i", "<C-e>", "<C-o>$", { desc = "Move to line end" })
+
+-- Resize windows without stealing the standard Ctrl+Arrow navigation.
+map("n", "<leader>wh", "<cmd>vertical resize -2<CR>", { desc = "Decrease window width" })
+map("n", "<leader>wl", "<cmd>vertical resize +2<CR>", { desc = "Increase window width" })
+map("n", "<leader>wk", "<cmd>resize +2<CR>", { desc = "Increase window height" })
+map("n", "<leader>wj", "<cmd>resize -2<CR>", { desc = "Decrease window height" })
 
 -- Buffer navigation
 map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
@@ -42,6 +57,16 @@ map("n", "N", "Nzzzv", { desc = "Previous match (centered)" })
 map("n", "<leader>x", function()
   require("statusline.tabline").close_buf(0)
 end, { desc = "Close current buffer" })
+map("n", "<leader>w", vim.cmd.write, { desc = "Save file" })
+
+-- Tabs and buffers
+map("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "New tab" })
+map("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close tab" })
+map("n", "<leader>to", "<cmd>tabonly<CR>", { desc = "Close other tabs" })
+
+-- Editing quality-of-life
+map("n", "Y", "y$", { desc = "Yank to end of line" })
+map("x", "p", '"_dP', { desc = "Paste without overwriting register" })
 
 -- Switch tabs with Alt+1..9 (VSCode-style)
 for i = 1, 9 do
