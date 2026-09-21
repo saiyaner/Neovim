@@ -54,15 +54,18 @@ elseif executable("pbcopy") and executable("pbpaste") then
     ["+"] = { "pbpaste" },
     ["*"] = { "pbpaste" },
   })
-elseif vim.ui.clipboard and vim.ui.clipboard.osc52 then
-  vim.g.clipboard = vim.ui.clipboard.osc52
 else
-  vim.schedule(function()
-    vim.notify(
-      "Clipboard provider tidak ditemukan. Tambahkan pkgs.wl-clipboard atau pkgs.xclip ke NixOS.",
-      vim.log.levels.WARN
-    )
-  end)
+  local ok, osc52 = pcall(require, "vim.ui.clipboard.osc52")
+  if ok then
+    vim.g.clipboard = osc52
+  else
+    vim.schedule(function()
+      vim.notify(
+        "Clipboard provider tidak ditemukan. Tambahkan pkgs.wl-clipboard atau pkgs.xclip ke NixOS.",
+        vim.log.levels.WARN
+      )
+    end)
+  end
 end
 
 vim.opt.clipboard = "unnamedplus"
